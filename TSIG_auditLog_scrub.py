@@ -23,17 +23,21 @@ def main():
     extSecLoc = auditFile.find("external_secondaries")
 
     extPrim = auditFile[extPriLoc:extSecLoc]
-    beforeArrow = extPrim.find("->")
-    extPrimCurrent = extPrim[18:beforeArrow]
-    extPrimChange = extPrim[beforeArrow+2:]
+    beforeArrowPri = extPrim.find("->")
+    extPrimCurrent = extPrim[18:beforeArrowPri]
+    extPrimChange = extPrim[beforeArrowPri+2:]
 
 
-#    extSecCurrent =
-#    extSecChange
+    extSec = auditFile[extSecLoc:]
+    beforeArrowSec = extSec.find("->")
+    extSecCurrent = extSec[18:beforeArrowSec]
+    extSecChange = extSec[beforeArrowSec+2:]
 
-    print(auditFile)
-    print(extPrimCurrent)
-    print(extPrimChange)
+    print ("wholefile " + auditFile)
+    print("extPrimCurrent " + extPrimCurrent)
+    print("extPrimChange " + extPrimChange)
+    print("extSecCurrent " + extSecCurrent)
+    print("extSecChange " + extSecChange)
 
 if __name__ == "__main__":
     main()
