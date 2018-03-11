@@ -24,20 +24,35 @@ def main():
 
     extPrim = auditFile[extPriLoc:extSecLoc]
     beforeArrowPri = extPrim.find("->")
-    extPrimCurrent = extPrim[18:beforeArrowPri]
-    extPrimChange = extPrim[beforeArrowPri+2:]
-
+    extPrimCurrent = extPrim[20:beforeArrowPri-1]
+    extPrimChange = extPrim[beforeArrowPri+3:-2]
+    extPrimCurrSet = set(extPrimCurrent.split("]"))
+    extPrimChgSet = set(extPrimChange.split("]"))
+    extPrimAdd = extPrimCurrSet.union(extPrimChgSet) - extPrimCurrSet
+    extPrimDelete = extPrimCurrSet.union(extPrimChgSet) - extPrimChgSet
 
     extSec = auditFile[extSecLoc:]
     beforeArrowSec = extSec.find("->")
-    extSecCurrent = extSec[18:beforeArrowSec]
-    extSecChange = extSec[beforeArrowSec+2:]
+    extSecCurrent = extSec[22:beforeArrowSec-1]
+    extSecChange = extSec[beforeArrowSec+3:-5]
+    extSecCurrSet = set(extSecCurrent.split("]"))
+    extSecChgSet = set(extSecChange.split("]"))
+    extSecAdd = extSecCurrSet.union(extSecChgSet) - extSecCurrSet
+    extSecDelete = extSecCurrSet.union(extSecChgSet) - extSecChgSet
 
-    print ("wholefile " + auditFile)
-    print("extPrimCurrent " + extPrimCurrent)
-    print("extPrimChange " + extPrimChange)
-    print("extSecCurrent " + extSecCurrent)
-    print("extSecChange " + extSecChange)
+#    print ("wholefile " + auditFile)
+#    print("extPrimCurrent " + extPrimCurrent)
+#    print("extPrimChange " + extPrimChange)
+#    print("extSecCurrent " + extSecCurrent)
+#    print("extSecChange " + extSecChange)
+#    print(extPrimCurrSet)
+#    print(extPrimChgSet)
+#    print(extPrimAdd)
+#    print(extPrimDelete)
+    print(extSecCurrSet)
+    print(extSecChgSet)
+    print(extSecAdd)
+    print(extSecDelete)
 
 if __name__ == "__main__":
     main()
