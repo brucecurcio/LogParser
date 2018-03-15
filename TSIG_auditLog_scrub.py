@@ -45,46 +45,63 @@ def ExtractEntry(auditList):
 #    print(action)
 
     fh = open("nsgChgFile.txt", "a")
-    fh.write(date + " | " + nameGrp + " | " + action + "\n")
+    fh.write(date + " | " + nameGrp + " | " + action + " | ")
     fh.close()
 
     print(date + " | " + nameGrp + " | " + action)
+    return action
 
-def DeltaLocator(auditEntry):
+def DeltaLocator(auditEntry, change):
 
     entryString = str(auditEntry)
+    print(change)
 
-    extPri = re.search('external_primaries:\[\[(.*?)external_secondaries', entryString).group(0)
-#    print (extPri)
+    fh = open("nsgChgFile.txt", "a")
 
-    extSec = re.search('external_secondaries(.*$)', entryString).group(0)
-#    print(extSec)
+#          EXTERNAL PRIMARY
 
-    extPriCurr = re.search('name(.*?)->', extPri).group(0)
-    extPriChg = re.search('->(.*$)', extPri).group(0)
-    #print(extPriCurr)
-    #print(extPriChg)
+    if change == "Changed external_primaries:":
+        extPri = re.search('external_primaries:\[\[(.*?)external_secondaries', entryString).group(0)
+        #print ("extPri " + extPri)
 
-    extPriCurrList = re.findall('name=\"(.*?\".*?\".*?)\"', extPriCurr)
+
+        extPriCurr = re.search('name(.*?)->', extPri).group(0)
+        extPriChg = re.search('->(.*$)', extPri).group(0)
+        #print(extPriCurr)
+        #print(extPriChg)
+
+        extPriCurrList = re.findall('name=\"(.*?\".*?\".*?)\"', extPriCurr)
     #    print(extPriCurrList)
-    extPriChgList = re.findall('name=\"(.*?\".*?\".*?)\"', extPriChg)
+        extPriChgList = re.findall('name=\"(.*?\".*?\".*?)\"', extPriChg)
     #    print(extPriChgList)
 
-    extPriCurrSet = set(extPriCurrList)
-    extPriChgSet = set(extPriChgList)
+        extPriCurrSet = set(extPriCurrList)
+        extPriChgSet = set(extPriChgList)
 
-    extPriAdd = extPriCurrSet.union(extPriChgSet) - extPriCurrSet
-    extPriDelete = extPriCurrSet.union(extPriChgSet) - extPriChgSet
-    print("Added Ext Primaries " + str(extPriAdd))
-    print("Deleted Ext Primaries " + str(extPriDelete))
+        extPriAdd = extPriCurrSet.union(extPriChgSet) - extPriCurrSet
+        extPriDelete = extPriCurrSet.union(extPriChgSet) - extPriChgSet
+        print("Added Ext Primaries " + str(extPriAdd))
+        print("Deleted Ext Primaries " + str(extPriDelete))
+
+        if (extPriAdd != set()):
+            fh.write("Added Ext Primaries " + str(extPriAdd) + " | ")
+        if (extPriDelete != set()):
+            fh.write("Deleted Ext Primaries " + str(extPriDelete) + " | ")
+
+#
+#       EXTERNAL SECONDARIES
+
+    extSec = re.search('external_secondaries(.*$)', entryString).group(0)
+    #print(extSec)
 
 
-    extSecCurr = re.search('name(.*?)->', extSec).group(0)
+    if (re.search('name(.*?)->', extSec) is None):
+        extSecCurr = "None"
+    else:
+        extSecCurr = re.search('name(.*?)->', extSec).group(0)
     extSecChg = re.search('->(.*$)', extSec).group(0)
     #print(extSecCurr)
     #print(extSecChg)
-
-
 
     extSecCurrList = re.findall('name=\"(.*?\".*?\".*?)\"', extSecCurr)
     extSecChgList = re.findall('name=\"(.*?\".*?\".*?)\"', extSecChg)
@@ -97,21 +114,18 @@ def DeltaLocator(auditEntry):
     print("Added Ext Secondaries " + str(extSecAdd))
     print("Deleted Ext Secondaries " + str(extSecDelete))
 
-    fh = open("nsgChgFile.txt", "a")
-    if (extPriAdd != set()):
-        fh.write("Added Ext Primaries " + str(extPriAdd) + "\n")
-    if (extPriDelete != set()):
-        fh.write("Deleted Ext Primaries " + str(extPriDelete) + "\n")
     if (extSecAdd != set()):
-        fh.write("Added Ext Secondaries " + str(extSecAdd) + "\n")
+        fh.write("Added Ext Secondaries " + str(extSecAdd) + " | ")
     if (extSecDelete != set()):
-        fh.write("Deleted Ext Secondaries " + str(extSecDelete) + "\n")
+        fh.write("Deleted Ext Secondaries " + str(extSecDelete) + " | ")
+
     fh.write("\n")
     fh.close()
 
-    extSecCurrList = re.findall('name=\"(.*?\".*?\".*?)\"', extSecCurr)
+#    extSecCurrList = re.findall('name=\"(.*?\".*?\".*?)\"', extSecCurr)
 #    print(extSecCurrList)
-    extSecChgList = re.findall('name=\"(.*?\".*?\".*?)\"', extSecChg)
+#    extSecChgList = re.findall('name=\"(.*?\".*?\".*?)\"', extSecChg)
+#    extSecChgList = re.findall('name=\"(.*?\".*?\".*?)\"', extSecChg)
 #    print(extSecChgList)
 
 
@@ -158,8 +172,8 @@ def main():
         print(file)
         logEntries = NSGLogExtractor(file)
         for line in logEntries:
-            ExtractEntry(line)
-            DeltaLocator(line)
+            changeAction = ExtractEntry(line)
+            DeltaLocator(line, changeAction)
 
 if __name__ == "__main__":
     main()
